@@ -596,7 +596,7 @@ let SAVE=blankSave(),hasSave=false,evolved=false;
 function persist(){try{localStorage.setItem(SKEY,JSON.stringify(SAVE))}catch(e){}}
 function loadGame(){try{const d=JSON.parse(localStorage.getItem(SKEY)||'null');if(d){SAVE=Object.assign(blankSave(),d);SAVE.mods=Object.assign(blankSave().mods,d.mods);SAVE.upg=Object.assign(blankSave().upg,d.upg);hasSave=true}}catch(e){}}
 function resetGame(){SAVE=blankSave();persist();hasSave=false;mapSel=0}
-function enterLevel(n){const m=SAVE.mods;P={lives:3+SAVE.upg.heart,cry:SAVE.cry,hasJet:m.jet,hasLaser:m.laser,hasExo:m.exo,hasWheel:m.wheel};buildLevel(n);state='play'}
+function enterLevel(n){if(n>=1){state='demo';return}const m=SAVE.mods;P={lives:3+SAVE.upg.heart,cry:SAVE.cry,hasJet:m.jet,hasLaser:m.laser,hasExo:m.exo,hasWheel:m.wheel};buildLevel(n);state='play'}
 const FMAX=()=>Math.round(70*(1+.5*SAVE.upg.bat));
 const comp=()=>Math.min(4,SAVE.cleared);
 
@@ -846,7 +846,7 @@ document.querySelectorAll('.tb').forEach(b=>{const k=b.dataset.k;b.addEventListe
 cv.addEventListener('pointerdown',()=>startAny(true));
 let lockT=0;
 function startAny(){if(lockT>0)return;lockT=30;
- if(state==='title'||state==='final'||state==='over'||state==='clear'){state='map';mapSel=Math.min(mapSel,NODES.length-1);if(state==='map'&&!nodeOpen(mapSel))mapSel=0}
+ if(state==='title'||state==='final'||state==='over'||state==='clear'||state==='demo'){state='map';mapSel=Math.min(mapSel,NODES.length-1);if(state==='map'&&!nodeOpen(mapSel))mapSel=0}
  keys.jumpP=0;beep(660,.1)}
 
 /* ---------- UPDATE ---------- */
@@ -1154,12 +1154,13 @@ function draw(){
   if(evolved&&LEVEL<3){center('Tu compañera evoluciona...',158,7,'#ffe066');center(COMP[LEVEL]+'  →  '+COMP[LEVEL+1],174,7,'#ff9ad5');center('¡Nuevo mundo desbloqueado!',190,6,'#6ff6ff')}
   else if(evolved)center('¡Nuevo mundo desbloqueado!',162,7,'#6ff6ff');else center('Progreso guardado',162,7,'#ffe066');
   if(frame%60<40)center('ENTER / TOCA para ir al mapa',216,7,'#fff')}
- if(state==='final'){ctx.fillStyle='rgba(10,5,30,.75)';ctx.fillRect(0,0,W,H);center('¡VICTORIA!',95,20,'#ffd23c');center('El Reino de los Hongos es libre',125,8,'#6ff6ff');center('Cristales totales: '+P.cry,148,8,'#8cff7a');center('Robot + Mariposa: juntos llegan más lejos',170,6,'#ff9ad5');center('¡Skin FANTASMA desbloqueado! (Tienda › Vestuario)',188,6,'#6ff6ff');if(frame%60<40)center('ENTER / TOCA para volver al mapa',210,7,'#fff')}
+ if(state==='demo'){ctx.fillStyle='rgba(5,10,30,.86)';ctx.fillRect(0,0,W,H);center('¡DEMO TERMINADA!',70,16,'#6ff6ff');center('Te gustó el Mundo 1?',100,8,'#ffe066');center('La versión completa trae 5 mundos,',122,7,'#cfe');center('2 jefes, skins y toda la evolución',136,7,'#cfe');center('Consíguela en:',160,7,'#8cff7a');center('hashwar-gif.github.io/juegos',176,8,'#ff9ad5');if(frame%60<40)center('ENTER: volver al mapa',204,6,'#ffe066')}
+  if(state==='final'){ctx.fillStyle='rgba(10,5,30,.75)';ctx.fillRect(0,0,W,H);center('¡VICTORIA!',95,20,'#ffd23c');center('El Reino de los Hongos es libre',125,8,'#6ff6ff');center('Cristales totales: '+P.cry,148,8,'#8cff7a');center('Robot + Mariposa: juntos llegan más lejos',170,6,'#ff9ad5');center('¡Skin FANTASMA desbloqueado! (Tienda › Vestuario)',188,6,'#6ff6ff');if(frame%60<40)center('ENTER / TOCA para volver al mapa',210,7,'#fff')}
 }
 loadGame();P={lives:3,cry:0};buildLevel(0);state='title';
 let last=performance.now(),accT=0;
 function loop(now){accT+=Math.min(100,now-last);last=now;while(accT>=1000/60){update();accT-=1000/60}draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 </script>
-</body>
+<script>addEventListener('pointerdown',e=>{if(state==='demo'&&e.clientY<innerHeight*0.8)open('https://hashwar-gif.github.io/juegos/','_blank')})</script></body>
 </html>
